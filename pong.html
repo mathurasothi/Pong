@@ -17,6 +17,9 @@
         var paddle1 = 250;
         var paddle2 = 250;
 
+        var player1Score = 0;
+        var player2Score = 0;
+
         function calculateMousePos(event) {
             var rect = canvas.getBoundingClientRect();
             var root = document.documentElement;
@@ -43,16 +46,30 @@
             canvas.addEventListener('mousemove',
                 function(event) {
                     var mousePos = calculateMousePos(event);
-                    paddle2 = mousePos.y - (PADDLE_HEIGHT/2); //determines which paddle moves
+                    paddle1 = mousePos.y - (PADDLE_HEIGHT/2); //determines which paddle moves
                 });
         }
 
         function ballReset() {
+            ballSpeedX = -ballSpeedX;
             ballX = canvas.width/2;
             ballY = canvas.height/2;
         }
 
+        function computerMovement() {   //automated paddle movement for opponent
+            var paddle2Center = paddle2 + (PADDLE_HEIGHT/2);
+
+            if (paddle2Center < ballY-35){  //the extra 35 pixels prevents shakiness
+                paddle2 += 6;
+            } else if(paddle2Center > ballY+35) {
+                paddle2 -= 6;
+            }
+        }
+
         function moveBoard() {
+
+            computerMovement();
+
             //Ball Movement
             ballX = ballX + ballSpeedX;
             ballY = ballY + ballSpeedY;
@@ -62,14 +79,16 @@
                     ballSpeedX = -ballSpeedX;
                 } else {
                     ballReset();
+                    player2Score++;
                 }
             }
 
             if (ballX > canvas.width) {     //bounce from the left side
-                if (ballY > paddle1 && ballY < paddle1 + PADDLE_HEIGHT) {
+                if (ballY > paddle2 && ballY < paddle2 + PADDLE_HEIGHT) {
                     ballSpeedX = -ballSpeedX;
                 } else {
                     ballReset();
+                    player1Score++;
                 }
             }  
 
@@ -92,6 +111,10 @@
             
             //Ball
             drawCirc('pink', ballX, ballY, 10);
+
+            //Score
+            canvasContext.fillText(player1Score, 100, 100);
+            canvasContext.fillText(player2Score, canvas.width-100, 100);
         }
 
         //Function that draws rectangle
